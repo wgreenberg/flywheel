@@ -1,0 +1,14 @@
+<html>
+  <head>
+    {% if title %}
+    <title>{{ title }} - Baby's first NLP</title>
+    {% else %}
+    <title> Baby's first NLP</title>
+    {% endif %}
+  </head>
+  <body>
+    <div></div>
+    <hr>
+    {% block content %}{% endblock %}
+  </body>
+</html>
