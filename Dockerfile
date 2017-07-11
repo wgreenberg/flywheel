@@ -32,7 +32,7 @@ RUN python3 -m nltk.downloader punkt
 COPY . /opt/flywheel
 
 # Python server
-EXPOSE 8080
+EXPOSE 5000
 # Gremlin server
 EXPOSE 8182
 
