@@ -1,9 +1,8 @@
 #!/bin/bash -e
 
 # Startup the gremlin server
-GREMLIN=/opt/gremlin-server
 pushd /opt/gremlin-server
-$GREMLIN/bin/gremlin-server.sh $GREMLIN/conf/gremlin-server-rest-modern.yaml &
+/opt/gremlin-server/bin/gremlin-server.sh /opt/flywheel/conf/gremlin-server.yml &
 popd
 
 echo "Waiting for gremlin to start..."
