@@ -2,24 +2,14 @@ FROM krallin/ubuntu-tini:xenial
 
 # Upgrade packages, setup java repo
 RUN apt-get update && \
-    apt-get dist-upgrade -y && \
-    apt-get install -y software-properties-common python-software-properties && \
-    echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-    add-apt-repository -y ppa:webupd8team/java
+    apt-get dist-upgrade -y
 
 # Install our dependencies
 RUN apt-get update && apt-get install -y \
-    oracle-java8-installer \
     python3 \
-    python3-pip \
-    unzip
+    python3-pip
 
 RUN pip3 install --upgrade pip
-
-# Install Gremlin
-RUN wget http://mirrors.advancedhosters.com/apache/tinkerpop/3.2.5/apache-tinkerpop-gremlin-server-3.2.5-bin.zip
-RUN unzip apache-tinkerpop-gremlin-server-3.2.5-bin.zip && \
-    mv apache-tinkerpop-gremlin-server-3.2.5 /opt/gremlin-server
 
 # Bust the docker cache if dependencies change
 COPY requirements.txt /opt/flywheel/requirements.txt
@@ -33,8 +23,6 @@ COPY . /opt/flywheel
 
 # Python server
 EXPOSE 5000
-# Gremlin server
-EXPOSE 8182
 
 ENTRYPOINT ["/usr/local/bin/tini", "-g", "--"]
 CMD ["/opt/flywheel/run.sh"]
