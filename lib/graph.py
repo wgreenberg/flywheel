@@ -32,6 +32,11 @@ class Graph():
                 self._pr_scores[v] = self._recalculate(v)
         return self._pr_scores
 
+    def sort_pagerank(self):
+        pr_results = self.pagerank().items()
+        sorted_results = sorted(pr_results, key=lambda r: r[1], reverse=True)
+        return [v.data for v, score in sorted_results]
+
     def _recalculate(self, v_i):
         new_score = 0
         for v_j, v_ji_weight in self.inV[v_i]:
