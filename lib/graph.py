@@ -22,8 +22,8 @@ class Graph():
         inV = defaultdict(set)
         outV = defaultdict(set)
         for e in self.E:
-            inV[e.dst].add(e.src)
-            outV[e.src].add(e.dst)
+            inV[e.dst].add((e.src, e.weight))
+            outV[e.src].add((e.dst, e.weight))
         return inV, outV
 
     def pagerank(self):
@@ -34,10 +34,10 @@ class Graph():
 
     def _recalculate(self, v_i):
         new_score = 0
-        for v_j in self.inV[v_i]:
+        for v_j, v_ji_weight in self.inV[v_i]:
             v_j_score = self._pr_scores[v_j]
-            v_j_out = self.outV[v_j]
-            new_score += (1 / len(v_j_out)) * v_j_score
+            v_jk_weight_sum = sum([w_jk for (v_k, w_jk) in self.outV[v_j]])
+            new_score += (v_ji_weight / v_jk_weight_sum) * v_j_score
         new_score *= self._pr_d
         new_score += 1 - self._pr_d
         return new_score

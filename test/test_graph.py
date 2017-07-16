@@ -7,24 +7,24 @@ from lib.graph import Vertex, Edge, Graph
 class TestExample1(unittest.TestCase):
     a, b, c, d = [Vertex(l) for l in 'ABCD']
     edges = [
-        Edge(a, b, 0),
-        Edge(a, c, 0),
-        Edge(c, a, 0),
-        Edge(b, c, 0),
-        Edge(d, c, 0),
+        Edge(a, b, 1),
+        Edge(a, c, 1),
+        Edge(c, a, 1),
+        Edge(b, c, 1),
+        Edge(d, c, 1),
     ]
     g = Graph([a,b,c,d], edges)
 
     def test_graph_connection_cache(self):
-        self.assertEqual(self.g.inV[self.a], set([self.c]))
-        self.assertEqual(self.g.inV[self.b], set([self.a]))
-        self.assertEqual(self.g.inV[self.c], set([self.a, self.b, self.d]))
+        self.assertEqual(self.g.inV[self.a], set([(self.c, 1)]))
+        self.assertEqual(self.g.inV[self.b], set([(self.a, 1)]))
+        self.assertEqual(self.g.inV[self.c], set([(self.a, 1), (self.b, 1), (self.d, 1)]))
         self.assertEqual(self.g.inV[self.d], set())
 
-        self.assertEqual(self.g.outV[self.a], set([self.b, self.c]))
-        self.assertEqual(self.g.outV[self.b], set([self.c]))
-        self.assertEqual(self.g.outV[self.c], set([self.a]))
-        self.assertEqual(self.g.outV[self.d], set([self.c]))
+        self.assertEqual(self.g.outV[self.a], set([(self.b, 1), (self.c, 1)]))
+        self.assertEqual(self.g.outV[self.b], set([(self.c, 1)]))
+        self.assertEqual(self.g.outV[self.c], set([(self.a, 1)]))
+        self.assertEqual(self.g.outV[self.d], set([(self.c, 1)]))
 
     def test_pagerank(self):
         pr_result = self.g.pagerank()
@@ -43,13 +43,13 @@ class TestExample2(unittest.TestCase):
     c = Vertex('External Site C')
     d = Vertex('External Site D')
     edges = [
-        Edge(home, about, 0), Edge(about, home, 0),
-        Edge(home, product, 0), Edge(product, home, 0),
-        Edge(home, links, 0), Edge(links, home, 0),
-        Edge(links, a, 0),
-        Edge(links, b, 0),
-        Edge(links, c, 0),
-        Edge(links, d, 0),
+        Edge(home, about, 1), Edge(about, home, 1),
+        Edge(home, product, 1), Edge(product, home, 1),
+        Edge(home, links, 1), Edge(links, home, 1),
+        Edge(links, a, 1),
+        Edge(links, b, 1),
+        Edge(links, c, 1),
+        Edge(links, d, 1),
     ]
     g = Graph([home, about, product, links, a, b, c, d], edges)
 
