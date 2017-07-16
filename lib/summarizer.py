@@ -19,10 +19,13 @@ def similarity(a, b):
     shared_words = sentence_to_words(a) & sentence_to_words(b)
     return len(shared_words) / (log(len(a)) + log(len(b)))
 
+_cached_sentences = {}
 def sentence_to_words(sentence):
-    words = word_tokenize(sentence)
-    stemmed = [stemmer.stem(w) for w in words]
-    return set(stemmed)
+    if sentence not in _cached_sentences:
+        words = word_tokenize(sentence)
+        stemmed = [stemmer.stem(w) for w in words]
+        _cached_sentences[sentence] = set(stemmed)
+    return _cached_sentences[sentence]
 
 def text_to_sentences(text):
     sentences = sent_tokenize(text)
