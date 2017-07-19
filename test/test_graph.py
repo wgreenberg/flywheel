@@ -2,7 +2,8 @@ import unittest
 
 from lib.graph import Vertex, Edge, Graph
 
-# All examples here from http://www.cs.princeton.edu/~chazelle/courses/BIB/pagerank.htm
+# All examples here from:
+# http://www.cs.princeton.edu/~chazelle/courses/BIB/pagerank.htm
 
 class TestExample1(unittest.TestCase):
     a, b, c, d = [Vertex(l) for l in 'ABCD']

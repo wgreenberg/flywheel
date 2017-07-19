@@ -1,5 +1,7 @@
 import asyncio
 
+from functools import lru_cache
+from itertools import combinations
 from math import log
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem.snowball import EnglishStemmer
@@ -8,44 +10,38 @@ from graph import Vertex, Edge, Graph
 
 stemmer = EnglishStemmer()
 
-# like SxS, except we don't care about repeat values or order
-def cartesian_square(S):
-    for i, a in enumerate(S):
-        for b in S[i+1:]:
-            yield (a, b)
-
 # from section 4.1
-def similarity(a, b):
-    shared_words = sentence_to_words(a) & sentence_to_words(b)
-    return len(shared_words) / (log(len(a)) + log(len(b)))
+def similarity(sentence_a, sentence_b):
+    words_a = sentence_to_words(sentence_a)
+    words_b = sentence_to_words(sentence_b)
+    return len(words_a & words_b) / (log(len(words_a)) + log(len(words_b)))
 
-_cached_sentences = {}
+@lru_cache(maxsize=1024)
 def sentence_to_words(sentence):
-    if sentence not in _cached_sentences:
-        words = word_tokenize(sentence)
-        stemmed = [stemmer.stem(w) for w in words]
-        _cached_sentences[sentence] = set(stemmed)
-    return _cached_sentences[sentence]
+    words = word_tokenize(sentence)
+    stemmed = [stemmer.stem(w) for w in words]
+    return set(stemmed)
 
 def text_to_sentences(text):
-    sentences = sent_tokenize(text)
+    normalized_text = text.replace('”', '"')
+    sentences = sent_tokenize(normalized_text)
     return filter(lambda s: len(s) > 1, sentences)
 
 def summarize(text):
     print("Creating graph...")
-    normalized_text = text.replace('”', '"')
-    sentences = text_to_sentences(normalized_text)
-
-    vertices = [Vertex(s) for s in sentences]
-
+    vertices = [Vertex(s) for s in text_to_sentences(text)]
     edges = []
-    for sent_a, sent_b in cartesian_square(vertices):
-        score = similarity(sent_a.data, sent_b.data)
-        edges.append(Edge(sent_a, sent_b, score))
-        edges.append(Edge(sent_b, sent_a, score))
+
+    for sentence_a, sentence_b in combinations(vertices, 2):
+        score = similarity(sentence_a.data, sentence_b.data)
+        edges.append(Edge(sentence_a, sentence_b, score))
+        edges.append(Edge(sentence_b, sentence_a, score))
+
+    # drop the memoized entries
+    sentence_to_words.cache_clear()
 
     g = Graph(vertices, edges)
-    print("Graph initialized: %d nodes" % len(vertices))
+    print("Graph initialized: |V|=%d, |E|=%d" % (len(vertices), len(edges)))
 
     print("Running pagerank...")
     return g.sort_pagerank()
