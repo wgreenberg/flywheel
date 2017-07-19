@@ -1,12 +1,10 @@
-import asyncio
-
 from functools import lru_cache
 from itertools import combinations
 from math import log
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem.snowball import EnglishStemmer
 
-from graph import Vertex, Edge, Graph
+from lib.graph import Vertex, Edge, Graph
 
 stemmer = EnglishStemmer()
 
@@ -45,10 +43,3 @@ def summarize(text):
 
     print("Running pagerank...")
     return g.sort_pagerank()
-
-if __name__ == '__main__':
-    import sys
-    with open(sys.argv[1]) as f:
-        sentences = summarize(f.read())
-        for s in sentences[0:7]:
-            print(s + '\n')
