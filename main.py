@@ -8,6 +8,7 @@ import sys, traceback
 import os
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 job_queue = Queue()
 
 def f_io(fn, mode, obj):
@@ -28,7 +29,9 @@ def process_loop():
     try:
         while True:
             job = job_queue.get()
-            obj = {"uid": job["uid"], "summary": summarizer.summarize(job["data"]), "summarized": True}
+            top_5_sentences = summarizer.summarize(job["data"])[:5]
+            summary = ' '.join(top_5_sentences)
+            obj = {"uid": job["uid"], "summary": summary, "summarized": True}
             f_io("data/"+str(job["uid"])+".json", "w+", obj)
     except KeyboardInterrupt:
         rm_files()
@@ -38,10 +41,9 @@ def process_loop():
 
 @app.route("/api/submit", methods=["POST"])
 def submit():
-    if not request.json or not "data" in request.json:
-        abort(400)
     uid = uuid.uuid4().int
-    job = {"uid": uid, "data": request.json["data"], "summarized": False}
+    data = str(request.get_data(), 'utf8')
+    job = {"uid": uid, "data": data, "summarized": False}
     f_io("data/{}.json".format(job["uid"]), "w+", job)
     job_queue.put(job)
     return jsonify({"response": job["uid"]}), 201
